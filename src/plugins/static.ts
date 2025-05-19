@@ -9,7 +9,6 @@ export const autoConfig = (fastify: FastifyInstance): FastifyStaticOptions => {
     "../..",
     fastify.config.PUBLIC_DIR
   );
-  console.log("fastify.config", fastify.config, import.meta.dirname, dirPath);
 
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath);
