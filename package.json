@@ -5,15 +5,11 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "demo": "concurrently -k -p \"[{name}]\" -n \"Backend,Demo\" -c \"cyan.bold,yellow.bold\" \"pnpm:start\" \"pnpm:serve\"",
+    "start": "node scripts/start.mjs",
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
     "serve": "serve ./demo -p 50000",
-    "start": "pnpm build && fastify start -l info dist/app.js",
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "dev": "pnpm run build && concurrently -k -p \"[{name}]\" -n \"TypeScript,App\" -c \"yellow.bold,cyan.bold\" \"pnpm:watch\" \"pnpm:dev:start\"",
-    "dev:start": "pnpm run build && fastify start --ignore-watch=.ts$ -w -l info -P dist/app.js",
-    "tracker:watch": "pnpm tracker:build && tsc -p tsconfig.tracker.json --watch && esbuild tracker/index.ts --bundle --format=iife --minify --outfile=public/tracker.js --target=es2017 --watch",
-    "tracker:build": "tsc -p tsconfig.tracker.json && esbuild tracker/index.ts --bundle --format=iife --minify --outfile=public/tracker.js --target=es2017"
+    "demo": "concurrently \"npm run serve\" \"npm run start\""
   },
   "repository": {
     "type": "git",
