@@ -6,6 +6,8 @@ declare module "fastify" {
       PORT: number;
       LOG_LEVEL: string;
       PUBLIC_DIR: string;
+      MONGODB_URI: string;
+      MONGODB_NAME: string;
     };
   }
 }
@@ -28,6 +30,14 @@ const schema = {
       minLength: 1,
       pattern: "^(?!.*\\.{2}).*$",
       default: "public",
+    },
+    MONGODB_URI: {
+      type: "string",
+      default: "mongodb://localhost:27017",
+    },
+    MONGODB_NAME: {
+      type: "string",
+      default: "tracker",
     },
   },
 };

@@ -16,6 +16,11 @@ export default async function (
   });
 
   await fastify.register(fastifyAutoload, {
+    dir: join(__dirname, "apps"),
+    options: { ...opts },
+  });
+
+  await fastify.register(fastifyAutoload, {
     dir: join(__dirname, "routes"),
     autoHooks: true,
     cascadeHooks: true,
