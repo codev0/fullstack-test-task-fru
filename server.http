@@ -1,4 +1,7 @@
-### 
+# This file contains test cases for the HTTP server using httpYac library.
+# https://httpyac.github.io/
+
+###
 # Wrong Content-Type
 POST http://localhost:8888/track
 Content-Type: application/json
