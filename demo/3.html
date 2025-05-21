@@ -1,18 +1,54 @@
 <html>
-<head>
-  <title>My website</title>
-  <script src="http://localhost:8888/tracker"></script>
-  <script>
-    tracker.track('pageview');
-    tracker.track('test', 'one', 'two', 'three');
-  </script>
-</head>
-<body>
-  <button onclick="tracker.track('click-button')">Click me</button>
-  <ul>
-    <li><a href="/index.html" onclick="tracker.track('click-link', '1')">1.html</a></li>
-    <li><a href="/2.html" onclick="tracker.track('click-link', '2')">2.html</a></li>
-    <li><a href="/3.html" onclick="tracker.track('click-link', '3', 'three')">3.html</a></li>
-  </ul>
-</body>
+  <head>
+    <title>My website</title>
+    <script>
+      (function (w, d, s, l, n) {
+        w["TrackerObject"] = n;
+        w[n] = w[n] || {
+          track: function () {
+            this.q.push({
+              event: arguments[0],
+              tags: Array.prototype.slice.call(arguments, 1),
+              ts: Date.now(),
+              url: w.location.href,
+              title: d.title,
+            });
+          },
+          q: [],
+        };
+        w[n].track("init", "userId", "config");
+        element = d.createElement(s);
+        firstElement = d.getElementsByTagName(s)[0];
+        element.async = 1;
+        element.src = l;
+        firstElement.parentNode.insertBefore(element, firstElement);
+      })(
+        window,
+        document,
+        "script",
+        "http://localhost:8888/tracker.js",
+        "tracker"
+      );
+      tracker.track("pageview");
+      tracker.track("test", "one", "two", "three");
+    </script>
+  </head>
+  <body>
+    <button onclick="tracker.track('click-button')">Click me</button>
+    <ul>
+      <li>
+        <a href="/index.html" onclick="tracker.track('click-link', '1')"
+          >1.html</a
+        >
+      </li>
+      <li>
+        <a href="/2.html" onclick="tracker.track('click-link', '2')">2.html</a>
+      </li>
+      <li>
+        <a href="/3.html" onclick="tracker.track('click-link', '3', 'three')"
+          >3.html</a
+        >
+      </li>
+    </ul>
+  </body>
 </html>
