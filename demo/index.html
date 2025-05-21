@@ -4,12 +4,19 @@
     <script>
       (function (w, d, s, l, n) {
         w["TrackerObject"] = n;
-        w[n] =
-          w[n] ||
-          function () {
-            (w[n].q = w[n].q || []).push(arguments);
-          };
-        w[n].l = 1 * new Date();
+        w[n] = w[n] || {
+          track: function () {
+            this.q.push({
+              event: arguments[0],
+              tags: Array.prototype.slice.call(arguments, 1),
+              ts: Date.now(),
+              url: w.location.href,
+              title: d.title,
+            });
+          },
+          q: [],
+        };
+        w[n].track('init', 'userId', 'config');
         element = d.createElement(s);
         firstElement = d.getElementsByTagName(s)[0];
         element.async = 1;
@@ -22,8 +29,8 @@
         "http://localhost:8888/tracker.js",
         "tracker"
       );
-      tracker("init", "userId", "config");
-      tracker("track", "pageview");
+      tracker.track("pageview");
+      tracker.track("test", "one", "two", "three");
     </script>
   </head>
   <body>

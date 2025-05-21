@@ -31,9 +31,6 @@ const track: FastifyPluginAsync = async (fastify) => {
     "/track",
     {
       schema: {
-        request: {
-          type: "string",
-        },
         response: {
           200: {
             type: "object",
@@ -48,6 +45,27 @@ const track: FastifyPluginAsync = async (fastify) => {
       request: FastifyRequest<{ Body: string }>,
       response: FastifyReply
     ) => {
+      if (!request.body) {
+        response.status(422).send({ message: "No events to track" });
+        return;
+      }
+
+      if (request.headers["content-type"] !== "text/plain") {
+        response.status(422).send({ message: "Invalid content type" });
+        return;
+      }
+
+      if (request.headers["content-length"] === "0") {
+        response.status(422).send({ message: "No events to track" });
+        return;
+      }
+
+      const contentLength = request.headers["content-length"];
+      if (contentLength && parseInt(contentLength, 10) > 1000000) {
+        response.status(422).send({ message: "Payload too large" });
+        return;
+      }
+
       const payload = await parseJSON(request.body);
 
       if (!Array.isArray(payload)) {

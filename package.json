@@ -9,7 +9,10 @@
     "build": "node scripts/build.mjs",
     "dev": "node scripts/dev.mjs",
     "serve": "serve ./demo -p 50000",
-    "demo": "concurrently \"npm run serve\" \"npm run start\""
+    "demo": "concurrently \"npm run serve\" \"npm run start\"",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage"
   },
   "repository": {
     "type": "git",
@@ -42,7 +45,9 @@
     "concurrently": "^9.1.2",
     "esbuild": "^0.25.4",
     "fastify-tsconfig": "^3.0.0",
+    "happy-dom": "^17.4.7",
     "serve": "^14.2.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.4"
   }
 }
