@@ -42,7 +42,8 @@ const track: FastifyPluginAsync = async (fastify) => {
       request: FastifyRequest<{ Body: string }>,
       response: FastifyReply
     ) => {
-      if (request.headers["content-type"] !== "text/plain") {
+      console.log("Received request to /track", request.body, request.headers['content-type'], typeof request.body);
+      if (!request.headers["content-type"]?.includes("text/plain")) {
         response.status(422).send({ message: "Invalid content type" });
         return;
       }

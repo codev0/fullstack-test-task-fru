@@ -42,14 +42,8 @@ export class ActivityTracker implements Tracker {
 
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") {
-        this.clearTimer();
-        this.flushSync();
+        this.onPageHide();
       }
-    });
-
-    window.addEventListener("beforeunload", () => {
-      this.clearTimer();
-      this.flushSync();
     });
   }
 
@@ -128,6 +122,12 @@ export class ActivityTracker implements Tracker {
       },
       body: JSON.stringify(events),
     });
+  }
+
+  onPageHide() {
+    this.clearTimer();
+    this.track("pagehide");
+    this.flushSync();
   }
 
   flushSync() {

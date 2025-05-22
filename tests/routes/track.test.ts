@@ -77,6 +77,43 @@ describe("Track Route", async () => {
     });
   });
 
+  it("should handle sendBeacon request", async () => {
+    const events = [
+      {
+        event: "test",
+        tags: ["tag1", "tag2"],
+        ts: Date.now(),
+        url: "http://example.com",
+        title: "Test Event",
+      },
+      {
+        event: "pagehide",
+        tags: [],
+        ts: Date.now(),
+        url: "http://example.com",
+        title: "Test Event 2",
+      },
+    ];
+    const response = await fastify.inject({
+      method: "POST",
+      url: "/track",
+      payload: JSON.stringify(events),
+      headers: {
+        "content-type": "text/plain;charset=UTF-8",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const docs = await fastify.mongo.db.collection("events").find().toArray();
+    events.forEach((event, index) => {
+      expect(docs[index].event).toBe(event.event);
+      expect(docs[index].tags).toEqual(event.tags);
+      expect(docs[index].ts).toBe(event.ts);
+      expect(docs[index].url).toBe(event.url);
+      expect(docs[index].title).toBe(event.title);
+    });
+  });
+
   it("should return 422 if no events to track", async () => {
     const response = await fastify.inject({
       method: "POST",
