@@ -20,17 +20,14 @@ function isValidEvent(event: unknown): event is TrackerEvent {
 }
 
 const track: FastifyPluginAsync = async (fastify) => {
-  fastify.addContentTypeParser(
-    "text/plain",
-    { parseAs: "string" },
-    (req, body, done) => done(null, body)
-  );
-
   const { trackerRepository } = fastify;
   fastify.post(
     "/track",
     {
       schema: {
+        body: {
+          type: "string",
+        },
         response: {
           200: {
             type: "object",
@@ -45,24 +42,13 @@ const track: FastifyPluginAsync = async (fastify) => {
       request: FastifyRequest<{ Body: string }>,
       response: FastifyReply
     ) => {
-      if (!request.body) {
-        response.status(422).send({ message: "No events to track" });
-        return;
-      }
-
       if (request.headers["content-type"] !== "text/plain") {
         response.status(422).send({ message: "Invalid content type" });
         return;
       }
 
-      if (request.headers["content-length"] === "0") {
+      if (!request.body) {
         response.status(422).send({ message: "No events to track" });
-        return;
-      }
-
-      const contentLength = request.headers["content-length"];
-      if (contentLength && parseInt(contentLength, 10) > 1000000) {
-        response.status(422).send({ message: "Payload too large" });
         return;
       }
 
