@@ -109,7 +109,7 @@ export class ActivityTracker implements Tracker {
       this.processQueue();
       return;
     }
-    
+
     this.sending = false;
     this.processQueue();
   }

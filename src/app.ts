@@ -1,14 +1,14 @@
 import { fileURLToPath } from "node:url";
-import { dirname, join } from 'node:path'
+import { dirname, join } from "node:path";
 import { FastifyInstance, FastifyPluginOptions } from "fastify";
 import fastifyAutoload from "@fastify/autoload";
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default async function (
   fastify: FastifyInstance,
-  opts: FastifyPluginOptions
+  opts: FastifyPluginOptions,
 ) {
   await fastify.register(fastifyAutoload, {
     dir: join(__dirname, "plugins"),
@@ -38,7 +38,7 @@ export default async function (
           params: request.params,
         },
       },
-      "Unhandled error occurred"
+      "Unhandled error occurred",
     );
 
     reply.code(error.statusCode ?? 500);
@@ -61,7 +61,7 @@ export default async function (
           params: request.params,
         },
       },
-      "Resource not found"
+      "Resource not found",
     );
 
     reply.code(404);

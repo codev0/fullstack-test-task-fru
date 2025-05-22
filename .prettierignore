@@ -1,0 +1,6 @@
+# Ignore artifacts:
+coverage
+dist
+public
+node_modules
+demo

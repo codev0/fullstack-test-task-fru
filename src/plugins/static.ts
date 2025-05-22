@@ -7,7 +7,7 @@ export const autoConfig = (fastify: FastifyInstance): FastifyStaticOptions => {
   const dirPath = path.join(
     import.meta.dirname,
     "../..",
-    fastify.config.PUBLIC_DIR
+    fastify.config.PUBLIC_DIR,
   );
 
   if (!fs.existsSync(dirPath)) {
@@ -16,7 +16,7 @@ export const autoConfig = (fastify: FastifyInstance): FastifyStaticOptions => {
 
   return {
     root: dirPath,
-    prefix: "/"
+    prefix: "/",
   };
 };
 

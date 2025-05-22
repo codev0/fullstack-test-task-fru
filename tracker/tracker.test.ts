@@ -5,7 +5,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({}),
-  })
+  }),
 ) as any;
 
 global.navigator.sendBeacon = vi.fn(() => true);
@@ -102,7 +102,7 @@ describe("ActivityTracker", () => {
         headers: {
           "Content-Type": "text/plain",
         },
-      })
+      }),
     );
     expect(tracker.q.length).toBe(0);
   });
@@ -110,7 +110,7 @@ describe("ActivityTracker", () => {
   it("should retry sending events on failure", async () => {
     const tracker = new ActivityTracker();
     vi.mocked(global.fetch).mockImplementationOnce(() =>
-      Promise.reject("Network error")
+      Promise.reject("Network error"),
     );
 
     tracker.track("event1");
@@ -128,7 +128,13 @@ describe("ActivityTracker", () => {
     const eventNames = sentBody.map((e) => e.event);
 
     expect(eventNames).toEqual(
-      expect.arrayContaining(["event1", "event2", "event3", "event4", "event5"])
+      expect.arrayContaining([
+        "event1",
+        "event2",
+        "event3",
+        "event4",
+        "event5",
+      ]),
     );
     expect(tracker.q.length).toBe(0);
   });
@@ -151,7 +157,7 @@ describe("ActivityTracker", () => {
     expect(flushSpy).toHaveBeenCalled();
     expect(global.navigator.sendBeacon).toHaveBeenCalledWith(
       "http://localhost:8888/track",
-      expect.stringContaining("event1")
+      expect.stringContaining("event1"),
     );
   });
 
@@ -168,7 +174,7 @@ describe("ActivityTracker", () => {
     expect(flushSpy).toHaveBeenCalled();
     expect(global.navigator.sendBeacon).toHaveBeenCalledWith(
       "http://localhost:8888/track",
-      expect.stringContaining("event1")
+      expect.stringContaining("event1"),
     );
   });
 

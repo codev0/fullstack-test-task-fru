@@ -17,7 +17,7 @@ const home: FastifyPluginAsync = async (fastify) => {
     },
     async () => {
       return { message: "Welcome to the Fastify API!" };
-    }
+    },
   );
 };
 

@@ -29,7 +29,7 @@ const { result, commands } = concurrently([
     command: "serve ./demo -p 50000",
     name: "Serve Demo",
     prefixColor: "magenta.bold",
-  }
+  },
 ]);
 
 result.then(
@@ -38,7 +38,7 @@ result.then(
   },
   () => {
     console.error("One or more commands failed");
-  }
+  },
 );
 
 process.on("SIGINT", async () => {

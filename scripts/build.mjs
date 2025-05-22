@@ -9,7 +9,7 @@ console.log("🤖 Building tracker... 🔄");
 execSync("tsc -p tsconfig.tracker.json", { stdio: "inherit" });
 execSync(
   "esbuild tracker/index.ts --bundle --format=iife --minify --outfile=public/tracker.js --target=es2017",
-  { stdio: "inherit" }
+  { stdio: "inherit" },
 );
 console.log("🤖 Tracker Built ✅");
 

@@ -7,7 +7,7 @@ export type TrackerEvent = {
   url: string;
   title: string;
   ts: number;
-}
+};
 
 declare module "fastify" {
   export interface FastifyInstance {
@@ -32,5 +32,5 @@ export default fp(
   },
   {
     name: "tracker-repository",
-  }
+  },
 );
