@@ -45,26 +45,26 @@ describe("ActivityTracker", () => {
     });
     expect(tracker.userId).toBe("userId");
     expect(tracker.config).toEqual("config");
-    expect(tracker.q.length).toBe(1);
+    expect(tracker.buffer.length).toBe(1);
   });
 
   it("should add events to queue", () => {
     const tracker = new ActivityTracker();
     tracker.track("pageview", "home");
 
-    expect(tracker.q.length).toBe(1);
-    expect(tracker.q[0].event).toBe("pageview");
-    expect(tracker.q[0].tags).toEqual(["home"]);
+    expect(tracker.buffer.length).toBe(1);
+    expect(tracker.buffer[0].event).toBe("pageview");
+    expect(tracker.buffer[0].tags).toEqual(["home"]);
 
     tracker.track("click", "button1");
-    expect(tracker.q.length).toBe(2);
-    expect(tracker.q[1].event).toBe("click");
-    expect(tracker.q[1].tags).toEqual(["button1"]);
+    expect(tracker.buffer.length).toBe(2);
+    expect(tracker.buffer[1].event).toBe("click");
+    expect(tracker.buffer[1].tags).toEqual(["button1"]);
   });
 
   it("should not send events if queue is empty", () => {
     const tracker = new ActivityTracker();
-    expect(tracker.q.length).toBe(0);
+    expect(tracker.buffer.length).toBe(0);
     expect(global.fetch).not.toHaveBeenCalled();
   });
 
@@ -74,14 +74,14 @@ describe("ActivityTracker", () => {
     tracker.track("event2");
     tracker.track("event3");
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    expect(tracker.q.length).toBe(0);
+    expect(tracker.buffer.length).toBe(0);
 
     // FIXME: find out why this is working
     tracker.track("new-event1");
     tracker.track("new-event2");
     await vi.runAllTimersAsync();
     expect(global.fetch).toHaveBeenCalledTimes(2);
-    expect(tracker.q.length).toBe(0);
+    expect(tracker.buffer.length).toBe(0);
   });
 
   it("should send events after throttle timeout", async () => {
@@ -89,7 +89,7 @@ describe("ActivityTracker", () => {
 
     tracker.track("event1");
     tracker.track("event2");
-    const copy = [...tracker.q];
+    const copy = [...tracker.buffer];
     expect(global.fetch).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1000);
 
@@ -104,7 +104,7 @@ describe("ActivityTracker", () => {
         },
       }),
     );
-    expect(tracker.q.length).toBe(0);
+    expect(tracker.buffer.length).toBe(0);
   });
 
   it("should retry sending events on failure", async () => {
@@ -136,7 +136,7 @@ describe("ActivityTracker", () => {
         "event5",
       ]),
     );
-    expect(tracker.q.length).toBe(0);
+    expect(tracker.buffer.length).toBe(0);
   });
 
   it("should flush and clear timer on document hidden", () => {
