@@ -11,7 +11,7 @@ declare module "fastify" {
   }
 }
 
-const mongoPlugin = fp(async (fastify: FastifyInstance, opts: any) => {
+const mongoPlugin = fp(async (fastify: FastifyInstance) => {
   const url = fastify.config.MONGODB_URI;
   const dbName = fastify.config.MONGODB_NAME;
 
@@ -19,10 +19,8 @@ const mongoPlugin = fp(async (fastify: FastifyInstance, opts: any) => {
   await client.connect();
   const db = client.db(dbName);
 
-  // Декорируем Fastify экземпляром mongo
   fastify.decorate("mongo", { client, db });
 
-  // Закрываем соединение при завершении работы Fastify
   fastify.addHook("onClose", async () => {
     await client.close();
   });
