@@ -15,10 +15,12 @@ declare module "fastify" {
   }
 }
 
+const COLLECTION_KEY = "tracks";
+
 function createRepository(fastify: FastifyInstance) {
   return {
     async createEvents(tracker: TrackerEvent[]) {
-      const collection = fastify.mongo.db.collection("events");
+      const collection = fastify.mongo.db.collection(COLLECTION_KEY);
       const result = await collection.insertMany(tracker);
       return result;
     },
@@ -32,5 +34,5 @@ export default fp(
   },
   {
     name: "tracker-repository",
-  },
+  }
 );
