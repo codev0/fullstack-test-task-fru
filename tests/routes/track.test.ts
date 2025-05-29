@@ -152,7 +152,7 @@ describe("Track Route", async () => {
     });
 
     expect(response.statusCode).toBe(422);
-    expect(response.json()).toEqual({ message: "Payload must be an array" });
+    expect(response.json()).toEqual({ message: "Invalid payload format" });
   });
 
   it("should return 422 if entity has invalid format", async () => {
@@ -174,6 +174,6 @@ describe("Track Route", async () => {
     });
 
     expect(response.statusCode).toBe(422);
-    expect(response.json()).toEqual({ message: "Invalid event format" });
+    expect(response.json()).toEqual({ message: "Invalid payload format" });
   });
 });

@@ -1,23 +1,6 @@
 import { FastifyPluginAsync, FastifyReply, FastifyRequest } from "fastify";
 import { parseJSON } from "../utils/parse-json.js";
-import { TrackerEvent } from "../apps/tracker/tracker.repository.js";
-
-function isValidEvent(event: unknown): event is TrackerEvent {
-  return (
-    typeof event === "object" &&
-    event !== null &&
-    "event" in event &&
-    "ts" in event &&
-    "tags" in event &&
-    "title" in event &&
-    "url" in event &&
-    Array.isArray((event as TrackerEvent).tags) &&
-    typeof (event as TrackerEvent).event === "string" &&
-    typeof (event as TrackerEvent).ts === "number" &&
-    typeof (event as TrackerEvent).title === "string" &&
-    typeof (event as TrackerEvent).url === "string"
-  );
-}
+import { TrackerEventsSchema } from "../apps/tracker/tracker.repository.js";
 
 const track: FastifyPluginAsync = async (fastify) => {
   const { trackerRepository } = fastify;
@@ -54,23 +37,22 @@ const track: FastifyPluginAsync = async (fastify) => {
 
       const payload = await parseJSON(request.body);
 
-      if (!Array.isArray(payload)) {
-        response.status(422).send({ message: "Payload must be an array" });
+      const { data, success, error } = TrackerEventsSchema.safeParse(payload);
+      if (!success) {
+        fastify.log.error(error, "Invalid payload format");
+        response.status(422).send({
+          message: "Invalid payload format",
+        });
         return;
       }
 
-      if (payload.length === 0) {
+      if (data.length === 0) {
         response.status(422).send({ message: "No events to track" });
         return;
       }
 
-      if (!payload.every(isValidEvent)) {
-        response.status(422).send({ message: "Invalid event format" });
-        return;
-      }
-
-      trackerRepository.createEvents(payload).catch((e) => {
-        fastify.log.error(e, "Error saving events (async)");
+      trackerRepository.createEvents(data).catch((e) => {
+        fastify.log.error(e, "Error saving events");
       });
 
       response.header("Access-Control-Allow-Origin", request.headers.origin);

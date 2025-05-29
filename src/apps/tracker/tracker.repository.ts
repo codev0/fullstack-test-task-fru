@@ -1,13 +1,18 @@
 import { FastifyInstance } from "fastify";
 import fp from "fastify-plugin";
+import { z } from "zod";
 
-export type TrackerEvent = {
-  event: string;
-  tags: string[];
-  url: string;
-  title: string;
-  ts: number;
-};
+export const TrackerEventsSchema = z.array(
+  z.object({
+    event: z.string(),
+    tags: z.array(z.string()),
+    url: z.string(),
+    title: z.string(),
+    ts: z.number(),
+  })
+);
+
+export type TrackerEvent = z.infer<typeof TrackerEventsSchema>[number];
 
 declare module "fastify" {
   export interface FastifyInstance {
