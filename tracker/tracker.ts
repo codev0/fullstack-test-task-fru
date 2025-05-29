@@ -55,6 +55,11 @@ export class ActivityTracker implements Tracker {
     return window.location.href;
   }
 
+  private getTs() {
+    const now = new Date();
+    return Math.floor(now.getTime() / 1000) + now.getTimezoneOffset() * 60;
+  }
+
   track(event: string, ...tags: string[]): void {
     if (event === "init") {
       this.userId = tags[0];
@@ -64,7 +69,7 @@ export class ActivityTracker implements Tracker {
     this.q.push({
       event,
       tags,
-      ts: Date.now(),
+      ts: this.getTs(),
       url: this.getUrl(),
       title: this.getTitle(),
     });

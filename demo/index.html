@@ -6,10 +6,11 @@
         w["TrackerObject"] = n;
         w[n] = w[n] || {
           track: function () {
+            const now = new Date();
             this.q.push({
               event: arguments[0],
               tags: Array.prototype.slice.call(arguments, 1),
-              ts: Date.now(),
+              ts: Math.floor(now.getTime() / 1000) + now.getTimezoneOffset() * 60,
               url: w.location.href,
               title: d.title,
             });
