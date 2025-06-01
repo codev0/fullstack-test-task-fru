@@ -1,7 +1,9 @@
-const URI = "http://localhost:8888/track";
-const EVENTS_TRESHOLD = 3;
-const THROTTLE_MS = 1000;
-const RESTORE_TIMEOUT = 1000;
+import { isNetworkError } from "./is-network-error";
+
+export const URI = "http://localhost:8888/track";
+export const BUFFER_TRESHOLD = 3;
+export const DEBOUNCE_MS = 1000;
+export const RESTORE_TIMEOUT = 1000;
 
 export interface Tracker {
   track(event: string, ...tags: string[]): void;
@@ -23,9 +25,13 @@ export class ActivityTracker implements Tracker {
   private buffer: TrackEvent[] = [];
   private sending = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
+  private lastSendTime = 0;
+  private onVisibilityChange: () => void;
 
   constructor(proxy?: Tracker) {
     this.init(proxy);
+    this.onVisibilityChange = this.onPageHide.bind(this);
+    document.addEventListener("visibilitychange", this.onVisibilityChange);
   }
 
   private getTitle() {
@@ -52,27 +58,46 @@ export class ActivityTracker implements Tracker {
         this.track(event.event, ...event.tags);
       });
     }
-    document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        this.onPageHide();
-      }
-    });
+  }
+
+  private enqueue(event) {
+    this.buffer.push(event);
+  }
+
+  private dequeueAll() {
+    const items = this.buffer;
+    this.buffer = [];
+    return items;
   }
 
   private processQueue() {
-    if (this.buffer.length >= EVENTS_TRESHOLD) {
+    if (this.sending) return;
+
+    if (this.buffer.length >= BUFFER_TRESHOLD) {
       this.clearTimer();
-      this.send();
+      this.send(this.dequeueAll());
+      return;
+    }
+
+    const now = Date.now();
+    const timeSinceLastSend = now - this.lastSendTime;
+
+    if (timeSinceLastSend >= DEBOUNCE_MS) {
+      this.clearTimer();
+      this.send(this.dequeueAll());
     } else {
-      this.schedule();
+      this.schedule(DEBOUNCE_MS - timeSinceLastSend);
     }
   }
 
-  private schedule() {
-    this.clearTimer();
+  private schedule(delay: number) {
+    if (this.timer) return;
     this.timer = setTimeout(() => {
-      this.send();
-    }, THROTTLE_MS);
+      this.timer = null;
+      if (this.buffer.length > 0) {
+        this.send(this.dequeueAll());
+      }
+    }, delay);
   }
 
   private clearTimer() {
@@ -82,50 +107,52 @@ export class ActivityTracker implements Tracker {
     }
   }
 
-  private async send() {
-    if (this.sending || !this.buffer.length) return;
-    const events = [...this.buffer];
-    this.buffer = [];
+  private async send(events: TrackEvent[]) {
+    if (!events.length) return;
+
     this.sending = true;
+    this.lastSendTime = Date.now();
 
     try {
       await this.sendToBackend(events);
-    } catch (e) {
-      await sleep(RESTORE_TIMEOUT);
-      this.buffer = [...events, ...this.buffer];
-      this.sending = false;
-      this.processQueue();
-      return;
+    } catch (e: unknown) {
+      if (isNetworkError(e)) {
+        await sleep(RESTORE_TIMEOUT);
+        this.buffer = [...events, ...this.buffer];
+      }
     }
 
     this.sending = false;
     this.processQueue();
   }
 
-  private async sendToBackend(events: TrackEvent[]) {
-    await fetch(URI, {
+  private async sendToBackend(events: TrackEvent[], keepAlive = false) {
+    return await fetch(URI, {
       method: "POST",
       headers: {
         "Content-Type": "text/plain",
       },
       body: JSON.stringify(events),
+      keepalive: keepAlive,
     });
   }
 
   private onPageHide() {
-    this.clearTimer();
-    this.track("pagehide");
-    this.flushSync();
+    if (document.visibilityState === "hidden") {
+      this.clearTimer();
+      this.track("pagehide");
+      this.flushSync();
+    }
   }
 
   private flushSync() {
     if (!this.buffer.length) return;
-    navigator.sendBeacon(URI, JSON.stringify(this.buffer));
+    this.sendToBackend([...this.buffer], true).catch(console.error);
     this.buffer = [];
   }
 
   track(event: string, ...tags: string[]): void {
-    this.buffer.push({
+    this.enqueue({
       event,
       tags,
       ts: this.getTs(),
@@ -133,5 +160,10 @@ export class ActivityTracker implements Tracker {
       title: this.getTitle(),
     });
     this.processQueue();
+  }
+
+  private destroy() {
+    this.clearTimer();
+    document.removeEventListener("visibilitychange", this.onVisibilityChange);
   }
 }
