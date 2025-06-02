@@ -2,7 +2,7 @@
 
 const objectToString = Object.prototype.toString;
 
-const isError = (value) => objectToString.call(value) === "[object Error]";
+const isError = (value: unknown) => objectToString.call(value) === "[object Error]";
 
 const errorMessages = new Set([
   "network error", // Chrome

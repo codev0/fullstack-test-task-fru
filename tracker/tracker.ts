@@ -54,13 +54,13 @@ export class ActivityTracker implements Tracker {
       Array.isArray(payload.q) &&
       payload.q.length
     ) {
-      payload.q.forEach((event) => {
+      payload.q.forEach((event: TrackEvent) => {
         this.track(event.event, ...event.tags);
       });
     }
   }
 
-  private enqueue(event) {
+  private enqueue(event: TrackEvent) {
     this.buffer.push(event);
   }
 
