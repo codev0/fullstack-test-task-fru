@@ -9,7 +9,7 @@ export const TrackerEventsSchema = z.array(
     url: z.string(),
     title: z.string(),
     ts: z.number(),
-  })
+  }),
 );
 
 export type TrackerEvent = z.infer<typeof TrackerEventsSchema>[number];
@@ -39,5 +39,5 @@ export default fp(
   },
   {
     name: "tracker-repository",
-  }
+  },
 );

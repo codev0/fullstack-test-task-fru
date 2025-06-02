@@ -23,7 +23,7 @@ const track: FastifyPluginAsync = async (fastify) => {
     },
     async (
       request: FastifyRequest<{ Body: string }>,
-      response: FastifyReply
+      response: FastifyReply,
     ) => {
       if (!request.headers["content-type"]?.includes("text/plain")) {
         response.status(422).send({ message: "Invalid content type" });
@@ -57,7 +57,7 @@ const track: FastifyPluginAsync = async (fastify) => {
 
       response.header("Access-Control-Allow-Origin", request.headers.origin);
       return response.send();
-    }
+    },
   );
 };
 

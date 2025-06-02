@@ -15,7 +15,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({}),
-  })
+  }),
 ) as any;
 
 function parseEventsBody(mockCall: any[] | undefined) {
@@ -90,7 +90,7 @@ describe("ActivityTracker", () => {
     await Promise.resolve();
 
     const eventNames = parseEventsBody(
-      vi.mocked(global.fetch).mock.calls[1]
+      vi.mocked(global.fetch).mock.calls[1],
     ).map((e: any) => e.event);
     expect(eventNames).toEqual(expect.arrayContaining(["event2", "event3"]));
     tracker["destroy"]();
@@ -111,7 +111,7 @@ describe("ActivityTracker", () => {
     await Promise.resolve();
     expect(global.fetch).toHaveBeenCalledTimes(2);
     const events = parseEventsBody(vi.mocked(global.fetch).mock.calls[1]).map(
-      (e: any) => e.event
+      (e: any) => e.event,
     );
     expect(events).toEqual(expect.arrayContaining(expected));
     tracker["destroy"]();
@@ -124,7 +124,7 @@ describe("ActivityTracker", () => {
       .mockImplementation(() =>
         failFetch
           ? Promise.reject(new Error("network error"))
-          : Promise.resolve({})
+          : Promise.resolve({}),
       );
 
     global.fetch = fetchMock;
@@ -143,7 +143,7 @@ describe("ActivityTracker", () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     const events = parseEventsBody(vi.mocked(global.fetch).mock.calls[1]).map(
-      (e: any) => e.event
+      (e: any) => e.event,
     );
     expect(events).toEqual(expect.arrayContaining(["event1", "event2"]));
     tracker["destroy"]();
@@ -156,7 +156,7 @@ describe("ActivityTracker", () => {
       .mockImplementation(() =>
         failFetch
           ? Promise.reject(new Error("network error"))
-          : Promise.resolve({})
+          : Promise.resolve({}),
       );
     global.fetch = fetchMock;
     tracker.track("event1");
@@ -170,10 +170,10 @@ describe("ActivityTracker", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
 
     const events = parseEventsBody(vi.mocked(fetchMock).mock.calls[1]).map(
-      (e: any) => e.event
+      (e: any) => e.event,
     );
     expect(events).toEqual(
-      expect.arrayContaining(["event1", "event2", "event3"])
+      expect.arrayContaining(["event1", "event2", "event3"]),
     );
     tracker["destroy"]();
   });
@@ -195,7 +195,7 @@ describe("ActivityTracker", () => {
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(vi.mocked(global.fetch).mock.calls[1][1]?.keepalive).toBe(true);
     const events = parseEventsBody(
-      vi.mocked(global.fetch).mock.calls.at(-1)
+      vi.mocked(global.fetch).mock.calls.at(-1),
     ).map((e: any) => e.event);
     expect(events).toEqual(expect.arrayContaining(["event2", "pagehide"]));
     tracker["destroy"]();
