@@ -1,0 +1,57 @@
+# This file contains test cases for the HTTP server using httpYac library.
+# https://httpyac.github.io/
+
+###
+# Wrong Content-Type
+POST http://localhost:8888/track
+Content-Type: application/json
+
+{
+  "event": "click",
+  "properties": {
+    "url": "http://example.com",
+    "title": "Example Page"
+  }
+}
+
+###
+# Missing Required Title Field
+{{
+exports.events = JSON.stringify([
+  {
+    event: "pageview",
+    tags: [],
+    url: "http://example.com",
+    ts: 1690000000,
+  }
+])
+}}
+POST http://localhost:8888/track
+Content-Type: text/plain
+
+{{events}}
+
+###
+# Valid Request
+{{
+exports.events = JSON.stringify([
+  {
+    event: "pageview",
+    tags: [],
+    url: "http://example.com",
+    title: "Example Page",
+    ts: 1690000000,
+  }
+])
+}}
+POST http://localhost:8888/track
+Content-Type: text/plain
+
+{{events}}
+
+{{
+  const assert = require('assert');
+  test("status ok", () => {
+    assert.equal(response.statusCode, 200);
+  });
+}}
