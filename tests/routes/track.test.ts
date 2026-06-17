@@ -23,7 +23,7 @@ describe("Track Route", async () => {
 
   beforeEach(async () => {
     // Чистим коллекции перед каждым тестом
-    await fastify.mongo.db.collection("events").deleteMany({});
+    await fastify.mongo.db.collection("tracks").deleteMany({});
   });
 
   afterAll(async () => {
@@ -67,13 +67,15 @@ describe("Track Route", async () => {
 
     expect(response.statusCode).toBe(200);
 
-    const docs = await fastify.mongo.db.collection("events").find().toArray();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    const docs = await fastify.mongo.db.collection("tracks").find().toArray();
     events.forEach((event, index) => {
-      expect(docs[index].event).toBe(event.event);
-      expect(docs[index].tags).toEqual(event.tags);
-      expect(docs[index].ts).toBe(event.ts);
-      expect(docs[index].url).toBe(event.url);
-      expect(docs[index].title).toBe(event.title);
+      expect(docs[index]?.event).toBe(event.event);
+      expect(docs[index]?.tags).toEqual(event.tags);
+      expect(docs[index]?.ts).toBe(event.ts);
+      expect(docs[index]?.url).toBe(event.url);
+      expect(docs[index]?.title).toBe(event.title);
     });
   });
 
@@ -104,13 +106,14 @@ describe("Track Route", async () => {
     });
 
     expect(response.statusCode).toBe(200);
-    const docs = await fastify.mongo.db.collection("events").find().toArray();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    const docs = await fastify.mongo.db.collection("tracks").find().toArray();
     events.forEach((event, index) => {
-      expect(docs[index].event).toBe(event.event);
-      expect(docs[index].tags).toEqual(event.tags);
-      expect(docs[index].ts).toBe(event.ts);
-      expect(docs[index].url).toBe(event.url);
-      expect(docs[index].title).toBe(event.title);
+      expect(docs[index]?.event).toBe(event.event);
+      expect(docs[index]?.tags).toEqual(event.tags);
+      expect(docs[index]?.ts).toBe(event.ts);
+      expect(docs[index]?.url).toBe(event.url);
+      expect(docs[index]?.title).toBe(event.title);
     });
   });
 
